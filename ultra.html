@@ -681,24 +681,38 @@ everyday detergent - designed to handle everything your current detergent does (
         </div>
 
         <script>
+        var currentVariant = 'fresh-tide';
+
         function selectVariant(variant) {
+          currentVariant = variant;
           var freshBtn = document.getElementById('variant-fresh-tide');
           var freeBtn = document.getElementById('variant-fragrance-free');
-          var ctaLink = document.getElementById('ultra-cta-btn');
 
           if (variant === 'fresh-tide') {
             freshBtn.style.border = '2px solid #00D1DB';
             freshBtn.style.background = '#e6fafb';
             freeBtn.style.border = '2px solid #ddd';
             freeBtn.style.background = '#fff';
-            ctaLink.href = 'https://uprootclean.com/cart/46192700424348:1?discount=XXRTUIX-SAVE50';
           } else {
             freeBtn.style.border = '2px solid #00D1DB';
             freeBtn.style.background = '#e6fafb';
             freshBtn.style.border = '2px solid #ddd';
             freshBtn.style.background = '#fff';
-            ctaLink.href = 'https://uprootclean.com/cart/46192700326044:1?discount=XXRTUIX-SAVE50';
           }
+          updateCtaUrl();
+        }
+
+        function updateCtaUrl() {
+          var ctaLink = document.getElementById('ultra-cta-btn');
+          var autoship = document.getElementById('autoship-toggle').checked;
+          var variantId = currentVariant === 'fresh-tide' ? '46192700424348' : '46192700326044';
+          if (autoship) {
+            var addPath = '/cart/add%3Fitems%5B%5D%5Bid%5D%3D' + variantId + '%26items%5B%5D%5Bquantity%5D%3D1%26items%5B%5D%5Bselling_plan%5D%3D2588311708%26discount%3DXXRTUIX-SAVE50%2CXXUURT18AA-FREESHIPPING%26return_to%3D%2Fcheckout';
+            var url = 'https://uprootclean.com/cart/clear?return_to=' + addPath;
+          } else {
+            var url = 'https://uprootclean.com/cart/' + variantId + ':1?discount=XXRTUIX-SAVE50,XXUURT18AA-FREESHIPPING';
+          }
+          ctaLink.href = url;
         }
         </script>
 
@@ -724,8 +738,58 @@ everyday detergent - designed to handle everything your current detergent does (
           </div>
         </div>
 
+        <!-- Auto Ship Toggle -->
+        <div style="border: 2px solid #00D1DB; border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; background: #e6fafb; cursor: pointer;" onclick="toggleAutoShip()">
+          <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin: 0;">
+            <div style="position: relative; width: 44px; height: 24px; flex-shrink: 0;">
+              <input type="checkbox" id="autoship-toggle" checked onchange="toggleAutoShip(event)" style="display: none;">
+              <div id="autoship-track" style="
+                width: 44px; height: 24px; background: #00D1DB; border-radius: 12px;
+                transition: background 0.2s ease; position: relative;
+              ">
+                <div id="autoship-thumb" style="
+                  width: 20px; height: 20px; background: #fff; border-radius: 50%;
+                  position: absolute; top: 2px; left: 22px;
+                  transition: left 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                "></div>
+              </div>
+            </div>
+            <div>
+              <span style="font-size: 14px; font-weight: 800; color: #004561; display: block; line-height: 1.3;">Auto Ship - Lock in $40 Credit on All Future Orders</span>
+              <span style="font-size: 12px; color: #666; display: block; margin-top: 2px;">Ships Every 2 Months &bull; Cancel anytime &bull; Modify frequency</span>
+            </div>
+          </label>
+        </div>
+
+        <script>
+        function toggleAutoShip(e) {
+          if (e) e.stopPropagation();
+          var checkbox = document.getElementById('autoship-toggle');
+          var track = document.getElementById('autoship-track');
+          var thumb = document.getElementById('autoship-thumb');
+          var wrapper = checkbox.closest('div[style*="border: 2px"]');
+
+          if (e && e.target !== checkbox) {
+            checkbox.checked = !checkbox.checked;
+          }
+
+          if (checkbox.checked) {
+            track.style.background = '#00D1DB';
+            thumb.style.left = '22px';
+            wrapper.style.borderColor = '#00D1DB';
+            wrapper.style.background = '#e6fafb';
+          } else {
+            track.style.background = '#ccc';
+            thumb.style.left = '2px';
+            wrapper.style.borderColor = '#ddd';
+            wrapper.style.background = '#f9f9f9';
+          }
+          updateCtaUrl();
+        }
+        </script>
+
         <!-- CTA Button -->
-        <a id="ultra-cta-btn" href="https://uprootclean.com/cart/46192700424348:1?discount=XXRTUIX-SAVE50" class="btn_scorall" style="
+        <a id="ultra-cta-btn" href="https://uprootclean.com/cart/clear?return_to=/cart/add%3Fitems%5B%5D%5Bid%5D%3D46192700424348%26items%5B%5D%5Bquantity%5D%3D1%26items%5B%5D%5Bselling_plan%5D%3D2588311708%26discount%3DXXRTUIX-SAVE50%2CXXUURT18AA-FREESHIPPING%26return_to%3D%2Fcheckout" class="btn_scorall" style="
           display: block;
           text-align: center;
           padding: 16px 20px;
