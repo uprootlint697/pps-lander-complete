@@ -707,10 +707,10 @@ everyday detergent - designed to handle everything your current detergent does (
           var autoship = document.getElementById('autoship-toggle').checked;
           var variantId = currentVariant === 'fresh-tide' ? '46192700227740' : '46192700129436';
           if (autoship) {
-            var addPath = '/cart/add%3Fitems%5B%5D%5Bid%5D%3D' + variantId + '%26items%5B%5D%5Bquantity%5D%3D1%26items%5B%5D%5Bselling_plan%5D%3D2588311708%26discount%3DXXRTUIX-SAVE50%2CXXUURT18AA-FREESHIPPING%26return_to%3D%2Fcheckout';
+            var addPath = '/cart/add%3Fitems%5B%5D%5Bid%5D%3D' + variantId + '%26items%5B%5D%5Bquantity%5D%3D1%26items%5B%5D%5Bselling_plan%5D%3D2588311708%26discount%3DXXRTUIX-SAVE50%2CXXUURT18AA-FREESHIPPING%26return_to%3D%2Fcheckout%253Futm_source%253DKlaviyo%2526utm_medium%253Dflow%2526utm_campaign%253DPostPurchaseCS';
             var url = 'https://uprootclean.com/cart/clear?return_to=' + addPath;
           } else {
-            var url = 'https://uprootclean.com/cart/' + variantId + ':1?discount=XXRTUIX-SAVE50,XXUURT18AA-FREESHIPPING';
+            var url = 'https://uprootclean.com/cart/' + variantId + ':1?discount=XXRTUIX-SAVE50,XXUURT18AA-FREESHIPPING&utm_source=Klaviyo&utm_medium=flow&utm_campaign=PostPurchaseCS';
           }
           ctaLink.href = url;
         }
@@ -789,7 +789,7 @@ everyday detergent - designed to handle everything your current detergent does (
         </script>
 
         <!-- CTA Button -->
-        <a id="pro-cta-btn" href="https://uprootclean.com/cart/clear?return_to=/cart/add%3Fitems%5B%5D%5Bid%5D%3D46192700227740%26items%5B%5D%5Bquantity%5D%3D1%26items%5B%5D%5Bselling_plan%5D%3D2588311708%26discount%3DXXRTUIX-SAVE50%2CXXUURT18AA-FREESHIPPING%26return_to%3D%2Fcheckout" class="btn_scorall" style="
+        <a id="pro-cta-btn" href="https://uprootclean.com/cart/clear?return_to=/cart/add%3Fitems%5B%5D%5Bid%5D%3D46192700227740%26items%5B%5D%5Bquantity%5D%3D1%26items%5B%5D%5Bselling_plan%5D%3D2588311708%26discount%3DXXRTUIX-SAVE50%2CXXUURT18AA-FREESHIPPING%26return_to%3D%2Fcheckout%253Futm_source%253DKlaviyo%2526utm_medium%253Dflow%2526utm_campaign%253DPostPurchaseCS" class="btn_scorall" style="
           display: block;
           text-align: center;
           padding: 16px 20px;
