@@ -702,35 +702,51 @@ everyday detergent - designed to handle everything your current detergent does (
           updateCtaUrl();
         }
 
-        function getLandingUtmQuery() {
+        var landerOnlyParams = ['hours', 'credit', 'detergent_img', 'bundle_img'];
+
+        function getLandingPassthroughParams() {
           var params = new URLSearchParams(window.location.search);
-          var utmParams = new URLSearchParams();
+          var passthrough = new URLSearchParams();
           params.forEach(function(value, key) {
-            if (key.indexOf('utm_') === 0) {
-              utmParams.append(key, value);
+            if (landerOnlyParams.indexOf(key) === -1) {
+              passthrough.append(key, value);
             }
           });
-          return utmParams.toString();
+          return passthrough;
+        }
+
+        function buildCheckoutReturnPath(passthroughParams) {
+          var query = passthroughParams.toString();
+          return query ? '/checkout?' + query : '/checkout';
+        }
+
+        function buildAutoshipCartUrl(variantId, checkoutReturnPath) {
+          var cartAddParams = new URLSearchParams();
+          cartAddParams.append('items[][id]', variantId);
+          cartAddParams.append('items[][quantity]', '1');
+          cartAddParams.append('items[][selling_plan]', '2588311708');
+          cartAddParams.set('discount', 'XXRTUIX-SAVE50,XXUURT18AA-FREESHIPPING');
+          cartAddParams.set('return_to', checkoutReturnPath);
+
+          var cartAddPath = '/cart/add?' + cartAddParams.toString();
+          var cartClearParams = new URLSearchParams();
+          cartClearParams.set('return_to', cartAddPath);
+
+          return 'https://uprootclean.com/cart/clear?' + cartClearParams.toString();
         }
 
         function updateCtaUrl() {
           var ctaLink = document.getElementById('pro-cta-btn');
           if (!ctaLink) return;
-          var utmQuery = getLandingUtmQuery();
-          var checkoutReturn = utmQuery ? '/checkout?' + utmQuery : '/checkout';
+          var passthroughParams = getLandingPassthroughParams();
+          var passthroughQuery = passthroughParams.toString();
           var autoship = document.getElementById('autoship-toggle').checked;
           var variantId = currentVariant === 'fresh-tide' ? '46192700227740' : '46192700129436';
           if (autoship) {
-            var cartAddQuery =
-              'items%5B%5D%5Bid%5D=' + variantId +
-              '%26items%5B%5D%5Bquantity%5D=1' +
-              '%26items%5B%5D%5Bselling_plan%5D=2588311708' +
-              '%26discount=XXRTUIX-SAVE50%2CXXUURT18AA-FREESHIPPING' +
-              '%26return_to=' + encodeURIComponent(checkoutReturn);
-            var url = 'https://uprootclean.com/cart/clear?return_to=/cart/add%3F' + cartAddQuery;
+            var url = buildAutoshipCartUrl(variantId, buildCheckoutReturnPath(passthroughParams));
           } else {
             var url = 'https://uprootclean.com/cart/' + variantId + ':1?discount=XXRTUIX-SAVE50,XXUURT18AA-FREESHIPPING';
-            if (utmQuery) url += '&' + utmQuery;
+            if (passthroughQuery) url += '&' + passthroughQuery;
           }
           ctaLink.href = url;
         }
