@@ -585,12 +585,8 @@
         }
 
         function buildCheckoutReturnPath(passthroughParams) {
-          var checkoutParams = new URLSearchParams();
-          checkoutParams.set('discount', LS_FREE_SHIP_CODE);
-          passthroughParams.forEach(function(value, key) {
-            if (key !== 'discount') checkoutParams.append(key, value);
-          });
-          return '/checkout?' + checkoutParams.toString();
+          var query = passthroughParams.toString();
+          return query ? '/checkout?' + query : '/checkout';
         }
 
         function appendAutoGift(cartAddParams, variantId) {
@@ -608,6 +604,7 @@
           }
           appendAutoGift(cartAddParams, LS_GIFT_MYSTERY);
           appendAutoGift(cartAddParams, LS_GIFT_MINI);
+          cartAddParams.set('discount', LS_FREE_SHIP_CODE);
           cartAddParams.set('return_to', checkoutReturnPath);
 
           var cartAddPath = '/cart/add?' + cartAddParams.toString();
@@ -708,7 +705,7 @@
         </script>
 
         <!-- CTA Button -->
-        <a id="pro-cta-btn" href="https://uprootclean.com/cart/clear?return_to=/cart/add%3Fitems%5B%5D%5Bid%5D%3D45979549204636%26items%5B%5D%5Bquantity%5D%3D1%26items%5B%5D%5Bselling_plan%5D%3D2369192092%26items%5B%5D%5Bid%5D%3D44601685803164%26items%5B%5D%5Bquantity%5D%3D1%26items%5B%5D%5Bproperties%5D%5B_auto_gift%5D%3Dtrue%26items%5B%5D%5Bid%5D%3D46257403527324%26items%5B%5D%5Bquantity%5D%3D1%26items%5B%5D%5Bproperties%5D%5B_auto_gift%5D%3Dtrue%26return_to%3D%2Fcheckout%3Fdiscount%3DTYUE89FREESHIPPING" class="btn_scorall" style="
+        <a id="pro-cta-btn" href="https://uprootclean.com/cart/clear?return_to=/cart/add%3Fitems%5B%5D%5Bid%5D%3D45979549204636%26items%5B%5D%5Bquantity%5D%3D1%26items%5B%5D%5Bselling_plan%5D%3D2369192092%26items%5B%5D%5Bid%5D%3D44601685803164%26items%5B%5D%5Bquantity%5D%3D1%26items%5B%5D%5Bproperties%5D%5B_auto_gift%5D%3Dtrue%26items%5B%5D%5Bid%5D%3D46257403527324%26items%5B%5D%5Bquantity%5D%3D1%26items%5B%5D%5Bproperties%5D%5B_auto_gift%5D%3Dtrue%26discount%3DTYUE89FREESHIPPING%26return_to%3D%2Fcheckout" class="btn_scorall" style="
           display: block;
           text-align: center;
           padding: 16px 20px;
