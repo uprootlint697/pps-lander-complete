@@ -799,9 +799,9 @@
   /* Pack size -> Recharge selling plan ID (30 / 60 / 90 day, 15% off).
      Fill these once plans are attached to the Laundry Cycle product in Recharge. */
   var SELLING_PLANS = {
-    '1-pack': '', /* 30 days */
-    '2-pack': '', /* 60 days */
-    '4-pack': ''  /* 90 days */
+    '1-pack': '2937389212', /* Delivery every 30 days · 15% off */
+    '2-pack': '2937421980', /* Delivery every 60 days · 15% off */
+    '4-pack': '2937454748'  /* Delivery every 90 days · 15% off */
   };
   var DISCOUNT = ''; /* optional stacked codes, comma-separated */
   /* ================================ */
@@ -869,17 +869,8 @@
     var cta = document.querySelector('.buybox-shell a.btn.block');
     if (cta) {
       cta.id = 'reorder-cta-btn';
-      cta.addEventListener('click', function (e) {
-        // Always rebuild immediately before navigation
+      cta.addEventListener('click', function () {
         updateCta();
-        var subscribe = isSubscription();
-        var pack = selectedValue('pack') || '4-pack';
-        if (subscribe && !getSellingPlanId(pack)) {
-          e.preventDefault();
-          console.error('Missing selling plan ID for', pack, '- attach 30/60/90 day plans (15% off) in Recharge, then set SELLING_PLANS in this lander.');
-          alert('Subscription checkout is not ready yet. Please choose One-Time Purchase, or contact support.');
-          return;
-        }
       });
     }
     document.querySelectorAll('input[name="fragrance"], input[name="pack"], input[name="purchase-type"]').forEach(function (input) {
