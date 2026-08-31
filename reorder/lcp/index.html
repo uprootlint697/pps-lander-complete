@@ -784,24 +784,24 @@
 (function () {
   /* ============ CONFIG ============ */
   var STORE = 'https://uprootclean.com';
+  /* SNS product: 9227070668956 (uproot-laundry-cycle-pro-sns) — Pro variants */
   var VARIANTS = {
   "fragrance-free": {
-    "1-pack": "46396273655964",
-    "2-pack": "46438111084700",
-    "4-pack": "46613983887516"
+    "1-pack": "47500155322524",
+    "2-pack": "47500155355292",
+    "4-pack": "47500155388060"
   },
   "fresh-coast": {
-    "1-pack": "46396273688732",
-    "2-pack": "46438111117468",
-    "4-pack": "46613983920284"
+    "1-pack": "47500155420828",
+    "2-pack": "47500155453596",
+    "4-pack": "47500155486364"
   }
 };
-  /* Pack size -> Recharge selling plan ID (30 / 60 / 90 day, 15% off).
-     Fill these once plans are attached to the Laundry Cycle product in Recharge. */
+  /* Pack size -> Shopify selling plan ID on SNS product (30 / 60 / 90 day, 15% off). */
   var SELLING_PLANS = {
-    '1-pack': '2937389212', /* Delivery every 30 days · 15% off */
-    '2-pack': '2937421980', /* Delivery every 60 days · 15% off */
-    '4-pack': '2937454748'  /* Delivery every 90 days · 15% off */
+    '1-pack': '2976350364', /* Delivery every 30 days · 15% off · 1 month */
+    '2-pack': '2976317596', /* Delivery every 60 days · 15% off · 2 months */
+    '4-pack': '2976284828'  /* Delivery every 90 days · 15% off · 3 months */
   };
   var DISCOUNT = ''; /* optional stacked codes, comma-separated */
   /* ================================ */
