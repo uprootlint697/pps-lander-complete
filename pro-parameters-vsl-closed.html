@@ -78,10 +78,15 @@
   border-radius: 4px; box-shadow: 0 6px 22px rgba(0,0,0,0.18);
   overflow: hidden;
 }
-.vsl-video-frame iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+.vsl-video-frame iframe {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
+  z-index: 1; pointer-events: none;
+}
 .vsl-unmute-overlay {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  position: absolute; inset: 0; z-index: 4;
+  display: flex; align-items: center; justify-content: center;
   background: rgba(0,0,0,0.15); cursor: pointer; transition: opacity 0.25s ease;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
 }
 .vsl-unmute-overlay.vsl-hidden { opacity: 0; pointer-events: none; }
 .vsl-unmute-box {
@@ -114,6 +119,10 @@ body.vsl-gate-active.vsl-revealed .vsl-gated-content {
   opacity: 1; max-height: none; overflow: visible; pointer-events: auto;
   transition: opacity 0.8s ease;
   animation: vslFadeIn 0.8s ease;
+}
+body.vsl-gate-active.vsl-revealed-restored .vsl-gated-content {
+  animation: none;
+  transition: none;
 }
 @keyframes vslFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -415,7 +424,7 @@ body.vsl-gate-active.vsl-revealed .vsl-gated-content {
      src="https://player.vimeo.com/video/1225004381?h=f4eb666b43&amp;autoplay=1&amp;muted=1&amp;controls=0&amp;title=0&amp;byline=0&amp;portrait=0&amp;dnt=1&amp;playsinline=1"
      frameborder="0" allow="autoplay; fullscreen" allowfullscreen loading="eager"></iframe>
 
-    <div class="vsl-unmute-overlay" id="vsl-unmute-overlay">
+    <div class="vsl-unmute-overlay" id="vsl-unmute-overlay" role="button" tabindex="0" aria-label="Click to unmute">
      <div class="vsl-unmute-box">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
        <path d="M11 5 6 9H3v6h3l5 4V5z" fill="#fff"/>
@@ -446,23 +455,74 @@ body.vsl-gate-active.vsl-revealed .vsl-gated-content {
   var REVEAL_MODE = 'closed';   // 'closed' or 'open'
   var REVEAL_AT_SECONDS = 825;           // 13:45
 
-  // QA/preview override: ?skip_video=true reveals the offer + everything
-  // below it immediately, without waiting for the timer. Video still plays
-  // as normal - this only bypasses the gate.
-  var SKIP_VIDEO = new URLSearchParams(window.location.search).get('skip_video') === 'true';
+  // QA/preview overrides:
+  //   ?skip_video=true  reveals the offer immediately (video still plays)
+  //   ?t=13:45 or ?t=825  jumps the Vimeo playhead forward
+  var pageParams = new URLSearchParams(window.location.search);
+  var SKIP_VIDEO = pageParams.get('skip_video') === 'true';
+  function parseSeekParam(raw) {
+    if (raw == null || raw === '') return null;
+    if (raw.indexOf(':') !== -1) {
+      var parts = raw.split(':');
+      var total = 0;
+      var i;
+      for (i = 0; i < parts.length; i++) {
+        var n = parseFloat(parts[i]);
+        if (isNaN(n)) return null;
+        total = total * 60 + n;
+      }
+      return total;
+    }
+    var sec = parseFloat(raw);
+    return isNaN(sec) ? null : sec;
+  }
+  var SEEK_SECONDS = parseSeekParam(pageParams.get('t'));
+
+  // Returning visitors who already waited through the reveal keep the
+  // offer visible on the same URL, same browser. Video still plays.
+  var REVEAL_STORAGE_KEY = 'vsl-revealed:' + window.location.pathname;
+  var previouslyRevealed = false;
+  try {
+    previouslyRevealed = localStorage.getItem(REVEAL_STORAGE_KEY) === '1';
+  } catch (e) {}
 
   var iframeEl = document.getElementById('vsl-player');
   var overlayEl = document.getElementById('vsl-unmute-overlay');
   var endOverlayEl = document.getElementById('vsl-end-overlay');
   var player = null;
   var revealed = false;
+  var unmuteRequested = false;
 
   function revealGatedContent() {
     if (revealed) return;
     revealed = true;
     document.body.classList.add('vsl-revealed');
+    try { localStorage.setItem(REVEAL_STORAGE_KEY, '1'); } catch (e) {}
     startProofToasts();
     if (window.vslShowStickyHeader) window.vslShowStickyHeader();
+  }
+
+  function applyUnmute() {
+    if (!player) return;
+    // iOS/Android ignore setVolume(); unmute has to go through setMuted,
+    // and it has to start in the same tap as the overlay (not after a seek).
+    player.setMuted(false).catch(function () {});
+    player.setVolume(1).catch(function () {});
+    player.play().catch(function () {});
+    if (SEEK_SECONDS == null) {
+      player.setCurrentTime(0).catch(function () {});
+    }
+  }
+
+  function requestUnmute(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (unmuteRequested) return;
+    unmuteRequested = true;
+    overlayEl.classList.add('vsl-hidden');
+    applyUnmute();
   }
 
   function loadVimeoSdk(cb) {
@@ -475,7 +535,16 @@ body.vsl-gate-active.vsl-revealed .vsl-gated-content {
 
   loadVimeoSdk(function () {
     player = new Vimeo.Player(iframeEl);
-    player.setVolume(0).catch(function () {});
+
+    if (SEEK_SECONDS != null) {
+      player.setCurrentTime(SEEK_SECONDS).catch(function () {});
+    }
+
+    if (unmuteRequested) {
+      applyUnmute();
+    } else {
+      player.setMuted(true).catch(function () {});
+    }
 
     if (REVEAL_MODE === 'open') {
       revealGatedContent();
@@ -496,16 +565,10 @@ body.vsl-gate-active.vsl-revealed .vsl-gated-content {
     });
   });
 
-  overlayEl.addEventListener('click', function () {
-    if (!player) return;
-    overlayEl.classList.add('vsl-hidden');
-    player.setCurrentTime(0).then(function () {
-      player.setVolume(1);
-      player.play();
-    }).catch(function () {
-      player.setVolume(1);
-      player.play();
-    });
+  overlayEl.addEventListener('click', requestUnmute);
+  overlayEl.addEventListener('touchend', requestUnmute, { passive: false });
+  overlayEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') requestUnmute(e);
   });
 
   endOverlayEl.addEventListener('click', function () {
@@ -563,7 +626,10 @@ body.vsl-gate-active.vsl-revealed .vsl-gated-content {
   // Runs down here (not up near where SKIP_VIDEO is read) so that
   // revealGatedContent() only fires once everything it depends on -
   // PROOF_ITEMS, startProofToasts(), etc. - actually exists.
-  if (SKIP_VIDEO) {
+  if (previouslyRevealed) {
+    document.body.classList.add('vsl-revealed-restored');
+  }
+  if (SKIP_VIDEO || previouslyRevealed || (SEEK_SECONDS != null && SEEK_SECONDS >= REVEAL_AT_SECONDS)) {
     revealGatedContent();
   }
 })();
