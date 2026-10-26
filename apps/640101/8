@@ -1,0 +1,2 @@
+/* Loads the live Funnelish app from the original funnel domain so this clone never serves a stale copy. */
+(function(){var s=document.createElement("script");s.src="https://order.uprootclean.com/apps/640101/8";s.async=false;document.head.appendChild(s);})();
