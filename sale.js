@@ -64,6 +64,8 @@
   function replaceGuaranteeCopy(txt) {
     var next = txt;
     next = next.replace(/!?\s*That[’']s twice the guarantee you[’']d get with Dyson or Furzapper\.?/gi, "");
+    // Page copy dropped the word "day": "Backed by 60-money-back guarantee".
+    next = next.replace(/\b60-money-back(\s+guarantee)\b/gi, "30-day money-back$1");
     next = next.replace(/\b60(?=[-\s]days?\b(?:[-\s]+money[-\s]?back)?[-\s]+guarantee\b)/gi, "30");
     // "60-Day Money<br>Back Guarantee" is split across text nodes.
     next = next.replace(/\b60(?=[-\s]days?\s+money\b)/gi, "30");
