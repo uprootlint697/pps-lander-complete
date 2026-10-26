@@ -54,6 +54,7 @@
 (function () {
   var SEAL_URL = "https://cdn.shopify.com/s/files/1/0551/2957/1484/files/60-days-guarantee.png?v=1792683520";
   var SEAL_CLASSES = ["guarantee_seal", "money-back-seal", "moneyback_seal", "money_back_seal", "package_seal"];
+  var SEAL_FILES = ["19642422-2600-40cf-a5d0-e1e026ced147"];
   var SKIP_TAGS = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, IFRAME: 1, CODE: 1, PRE: 1, TEXTAREA: 1 };
   var busy = false;
 
@@ -122,9 +123,12 @@
     for (var i = 0; i < SEAL_CLASSES.length; i++) {
       if (img.classList && img.classList.contains(SEAL_CLASSES[i])) return true;
     }
-    var oldUrls = [src, dataSrc, srcset].filter(function (url) {
+    var oldUrls = [src, dataSrc, srcset, img.getAttribute("srcset")].filter(function (url) {
       return url && !isCurrentSeal(url);
     }).join(" ");
+    for (var f = 0; f < SEAL_FILES.length; f++) {
+      if (oldUrls.indexOf(SEAL_FILES[f]) !== -1) return true;
+    }
     return /60[-_ ]?days?[-_ ]?(guarantee|money)|money[-_ ]?back[-_ ]?60/i.test(oldUrls);
   }
 
