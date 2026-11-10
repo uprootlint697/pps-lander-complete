@@ -8,6 +8,18 @@
 
   const urlParams = getUrlParams();
 
+  // These used to be a second script on the Funnelish step. Updating the
+  // sale script overwrote it, so the param lives here and only on these paths.
+  function pageParam() {
+    const path = window.location.pathname.replace(/\/+$/, "");
+    if (path === "/wmt008-l4v2-mustyclothes-1528" || path === "/l/wmt_l008-l4v2-1528") return "ig_ab=01528";
+    if (path === "/wmt008-l4v2-mustyclothes-1527" || path === "/l/wmt_l008-l4v2-1527") return "ig_ab=01527";
+    if (path === "/wmt008-l4v2-mustyclothes" || path === "/l/wmt008-l4v2") return "ig_entry=1";
+    return "";
+  }
+
+  const extraParam = pageParam();
+
   function updateLinks() {
     const currentDomain = window.location.hostname;
 
@@ -34,6 +46,12 @@
       if (!href.includes('click_from=')) {
         const separator = baseUrl.includes('?') ? '&' : '?';
         baseUrl += separator + 'click_from=funnelish';
+      }
+
+      // Intelligems entrance param, product links only.
+      if (extraParam && baseUrl.includes('/products/') && !baseUrl.includes(extraParam)) {
+        const separator = baseUrl.includes('?') ? '&' : '?';
+        baseUrl += separator + extraParam;
       }
 
       // Reattach hash fragment if it exists
